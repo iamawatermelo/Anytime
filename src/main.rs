@@ -1,3 +1,24 @@
+use clap::{Parser, Subcommand};
+
+mod config;
+
+#[derive(Parser, Debug)]
+#[command(version, about = "Alternative Wakatime tracker tool", long_about = None)]
+#[command(propagate_version = true)]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand, Debug)]
+enum Commands {
+    #[command(about = "Track your time")]
+    Track {
+        
+    }
+}
+
 fn main() {
-    println!("Hello, world!");
+    let cli = Cli::parse();
+    println!("{cli:#?}")
 }
