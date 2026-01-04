@@ -1,6 +1,9 @@
 use clap::{Parser, Subcommand};
 
+mod userconfig;
+mod heartbeat;
 mod config;
+mod legacy;
 
 #[derive(Parser, Debug)]
 #[command(version, about = "Alternative Wakatime tracker tool", long_about = None)]
