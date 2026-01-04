@@ -1,0 +1,10 @@
+[package]
+name = "anytime"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+crossbeam = "0.8.4"
+notify = { version = "8.2.0", features = ["crossbeam-channel", "macos_kqueue"] }
+serde = { version = "1.0.228", features = ["derive", "serde_derive"] }
+toml = "0.9.10"
