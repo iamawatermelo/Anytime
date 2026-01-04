@@ -24,3 +24,9 @@ struct ProjectConfigFiles {
     #[serde(default = "default_exclude_binary_files")]
     exclude_binary_files: bool
 }
+
+impl ProjectConfig {
+    fn default_from_current_project() {
+        
+    }
+}
