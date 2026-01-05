@@ -1,5 +1,7 @@
 //! Heartbeat structs
 
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]

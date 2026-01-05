@@ -1,14 +1,16 @@
-use std::time::SystemTime;
+use std::{env::current_dir, path::PathBuf, time::SystemTime};
 
-use log::{info, trace};
-use clap::{Parser, Subcommand};
+use anyhow::{Context, Result};
+use log::{debug, info, trace};
+use clap::{Parser, Subcommand, Args};
 use fern::colors::{Color, ColoredLevelConfig};
 
+use crate::{config::{ProjectConfig, UserConfig}, git::GitCli};
+
+mod git;
 mod watcher;
-mod userconfig;
+mod config;
 mod heartbeat;
-mod projectconfig;
-mod legacy;
 
 #[derive(Parser, Debug)]
 #[command(version, about = "Alternative Wakatime tracker tool", long_about = None)]
@@ -21,13 +23,27 @@ struct Cli {
     verbose: u8
 }
 
+#[derive(Args, Debug)]
+struct TrackArgs {
+    project_path: Option<PathBuf>
+}
+
 #[derive(Subcommand, Debug)]
 enum Commands {
     #[command(about = "Track your time")]
-    Track {}
+    Track {
+        #[clap(flatten)]
+        args: TrackArgs
+    },
+    
+    #[command(about = "Track your time")]
+    Test {
+        #[clap(flatten)]
+        args: TrackArgs
+    }
 }
 
-fn main() {
+fn main() -> Result<()> {
     let cli = Cli::parse();
     
     let colors_line = ColoredLevelConfig::new()
@@ -68,5 +84,37 @@ fn main() {
     
     trace!("Set up logging");
     trace!("Parsed CLI: {cli:#?}");
-    info!("Hello, world! {} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+    info!("{} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+    
+    let user_config = UserConfig::load()?;
+    debug!("loaded user cfg: {user_config:#?}");
+    
+    let git_cli = GitCli::new().ok();
+    match git_cli {
+        Some(ref c) => debug!("using git v{}.{}.{}", c.version_tuple.0, c.version_tuple.1, c.version_tuple.2),
+        None => debug!("no git cli found")
+    }
+    
+    match cli.command {
+        Commands::Track { args } => {
+            let project_path = args.project_path
+                .or(git_cli.and_then(|c| {
+                    let root = c.get_project_root();
+                    trace!("git cli root {root:#?}");
+                    
+                    root.ok()
+                }))
+                .or(current_dir().ok())
+                .context("couldn't determine project path")?;
+            debug!("using project path {project_path:#?}");
+            
+            let config = ProjectConfig::load(&project_path, &user_config)?;
+            debug!("using project config {config:#?}")
+            
+            
+        }
+        Commands::Test { .. } => todo!()
+    }
+    
+    Ok(())
 }
