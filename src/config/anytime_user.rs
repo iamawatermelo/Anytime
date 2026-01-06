@@ -22,6 +22,8 @@ pub struct Files {
     pub hide_branch_names: Option<bool>,
     #[serde(default)]
     pub obfuscate_project_names: Option<bool>,
+    #[serde(default)]
+    pub use_polling: Option<bool>,
 }
 
 #[derive(Debug, Deserialize, Default)]
@@ -46,4 +48,10 @@ pub struct Heartbeats {
 pub struct Defaults {
     #[serde(default)]
     pub exclude_binary_files: Option<bool>,
+    #[serde(default)]
+    pub ignore: Option<Vec<String>>,
+    #[serde(default)]
+    pub ignorefiles: Option<Vec<String>>,
+    #[serde(default)]
+    pub include: Option<Vec<String>>,
 }

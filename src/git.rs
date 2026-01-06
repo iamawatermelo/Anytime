@@ -3,7 +3,7 @@
 use std::{path::PathBuf, process::Command};
 
 use anyhow::{Context, Result, bail};
-use log::{debug, trace};
+use log::trace;
 
 pub struct GitCli {
     pub version_tuple: (usize, usize, usize)

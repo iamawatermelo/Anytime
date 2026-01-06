@@ -5,7 +5,7 @@ use log::{debug, info, trace};
 use clap::{Parser, Subcommand, Args};
 use fern::colors::{Color, ColoredLevelConfig};
 
-use crate::{config::{ProjectConfig, UserConfig}, git::GitCli};
+use crate::{config::{ProjectConfig, UserConfig}, git::GitCli, watcher::FileWatcher};
 
 mod git;
 mod watcher;
@@ -109,9 +109,9 @@ fn main() -> Result<()> {
             debug!("using project path {project_path:#?}");
             
             let config = ProjectConfig::load(&project_path, &user_config)?;
-            debug!("using project config {config:#?}")
+            debug!("using project config {config:#?}");
             
-            
+            let watcher = FileWatcher::new(project_path.as_path(), &config);
         }
         Commands::Test { .. } => todo!()
     }

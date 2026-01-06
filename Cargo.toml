@@ -7,8 +7,10 @@ edition = "2024"
 anyhow = "1.0.100"
 clap = { version = "4.5.54", features = ["derive"] }
 crossbeam = "0.8.4"
+crossbeam-channel = "0.5.15"
 fern = { version = "0.7.1", features = ["colored"] }
 humantime = "2.3.0"
+ignore = "0.4.25"
 log = "0.4.29"
 notify-debouncer-full = { version = "0.6.0", features = ["crossbeam-channel", "macos_fsevent"] }
 serde = { version = "1.0.228", features = ["derive", "serde_derive"] }

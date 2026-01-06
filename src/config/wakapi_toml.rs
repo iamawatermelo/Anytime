@@ -18,4 +18,10 @@ pub struct Project {
 pub struct Files {
     #[serde(default)]
     pub exclude_binary_files: Option<bool>,
+    #[serde(default)]
+    pub exclude_files: Option<Vec<String>>,
+    #[serde(default)]
+    pub exclude: Option<Vec<String>>,
+    #[serde(default)]
+    pub include: Option<Vec<String>>,
 }

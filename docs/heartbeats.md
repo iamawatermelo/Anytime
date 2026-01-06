@@ -29,7 +29,7 @@ user-agent: wakatime/unset (linux-none-none) anytime/0.1.0 anytime-wakatime/0.1.
     "skf": 36,
     "xcs": 101.82
     "mcs": 98.82
-    "lcs": [101.82, 98.82, 100.17, 99.37, 102.01]
+    "acs": 100.17
   }
 }]
 ```

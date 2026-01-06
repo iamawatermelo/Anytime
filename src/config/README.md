@@ -26,7 +26,25 @@ Sources:
   Defaults (in order):
   - `files.exclude_binary_files` in `wak.toml`
   - `defaults.exclude_binary_files` in your user config
-  - `true`.
+  
+- `ignorefiles` _String[]_  
+  Set of ignore files to use, in glob format.
+  Defaults (in order):
+  - `files.exclude_files` in `wak.toml`
+  - `defaults.ignorefiles` in your user config
+
+
+- `ignore` _String[]_  
+  Set of files/directories to ignore, in glob format.
+  Defaults (in order):
+    - `files.exclude` in `wak.toml`
+    - `defaults.ignore` in your user config
+
+- `include` _String[]_  
+  Set of files/directories to include, in glob format.
+  Defaults (in order):
+    - `files.include` in `wak.toml`
+    - `defaults.include` in your user config
 
 ## User configuration
 
@@ -50,6 +68,13 @@ Sources:
 
 - `obfuscate_project_names` _Boolean_  
   When `true`, Anytime will create a .wakatime-project file if the project name hasn't already been set with a randomly generated project name. Default: `false`.
+
+- `use_polling` _Boolean_  
+  Whether to use constant polling instead of platform-specific file watching APIs. Default: `false`.  
+  
+> [!CAUTION]
+> The polling backend has poor performance. Only use it if your platform-specific
+> backend doesn't work for you, for whatever reason.
 
 ### `[api]`
 
@@ -80,3 +105,12 @@ Sources:
 
 - `exclude_binary_files` _Boolean_  
   Whether to exclude non-UTF-8 files from tracking. Default: `true`.
+
+- `ignorefiles` _String[]_  
+  Set of ignore files to use, in glob format. Default: `[".gitignore", ".ignore"]`.
+
+- `ignore` _String[]_  
+  Set of files/directories to ignore, in glob format. Default: `[".*", ".git/"]`.
+
+- `include` _String[]_  
+  Set of files/directories to include, in glob format. Default: `[".gitignore"]`.

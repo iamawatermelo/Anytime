@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use log::trace;
+use log::{trace, warn};
 use serde::Deserialize;
 use std::{
     env, fs,
@@ -16,6 +16,9 @@ pub struct ProjectConfig {
     pub name: String,
     pub category: String,
     pub exclude_binary_files: bool,
+    pub ignorefiles: Vec<String>,
+    pub ignore: Vec<String>,
+    pub include: Vec<String>,
 }
 
 impl ProjectConfig {
@@ -78,6 +81,21 @@ impl ProjectConfig {
                 .or(wak_toml.files.exclude_binary_files)
                 .or(user_config.default_exclude_binary_files)
                 .unwrap_or(true),
+            ignorefiles: anytime_proj
+                .files
+                .ignorefiles
+                .or(wak_toml.files.exclude_files)
+                .unwrap_or_else(|| user_config.default_ignorefiles.clone()),
+            ignore: anytime_proj
+                .files
+                .ignore
+                .or(wak_toml.files.exclude)
+                .unwrap_or_else(|| user_config.default_ignore.clone()),
+            include: anytime_proj
+                .files
+                .include
+                .or(wak_toml.files.include)
+                .unwrap_or_else(|| user_config.default_include.clone()),
         };
 
         Ok(project_config)
@@ -90,12 +108,16 @@ pub struct UserConfig {
     pub obfuscate_file_names: bool,
     pub hide_branch_names: bool,
     pub obfuscate_project_names: bool,
+    pub use_polling: bool,
     pub endpoint: String,
     pub api_key: Option<String>,
     pub rate_limit_seconds: u64,
     pub offline: bool,
     pub obfuscate_machine: bool,
     pub default_exclude_binary_files: Option<bool>,
+    pub default_ignorefiles: Vec<String>,
+    pub default_ignore: Vec<String>,
+    pub default_include: Vec<String>,
 }
 
 impl UserConfig {
@@ -144,6 +166,22 @@ impl UserConfig {
         };
 
         // User config stitching
+        let rate_limit_seconds = {
+            let limit = anytime_user
+                .heartbeats
+                .rate_limit_seconds
+                .or(wakatime_ini.settings.heartbeat_rate_limit_seconds)
+                .unwrap_or(30);
+            if limit < 3 {
+                warn!(
+                    "Heartbeat interval of {} seconds is too low. Setting to 3 seconds.",
+                    limit
+                );
+                3
+            } else {
+                limit
+            }
+        };
         let user_config = Self {
             use_relative_filenames: anytime_user
                 .files
@@ -153,19 +191,28 @@ impl UserConfig {
             obfuscate_file_names: anytime_user.files.obfuscate_file_names.unwrap_or(false),
             hide_branch_names: anytime_user.files.hide_branch_names.unwrap_or(false),
             obfuscate_project_names: anytime_user.files.obfuscate_project_names.unwrap_or(false),
+            use_polling: anytime_user.files.use_polling.unwrap_or(false),
             endpoint: wakatime_ini
                 .settings
                 .api_url
                 .unwrap_or_else(|| "https://api.wakatime.com/api/v1".to_string()),
             api_key: wakatime_ini.settings.api_key.or(anytime_user.api.api_key),
-            rate_limit_seconds: anytime_user
-                .heartbeats
-                .rate_limit_seconds
-                .or(wakatime_ini.settings.heartbeat_rate_limit_seconds)
-                .unwrap_or(30),
+            rate_limit_seconds,
             offline: anytime_user.heartbeats.offline.unwrap_or(true),
             obfuscate_machine: anytime_user.heartbeats.obfuscate_machine.unwrap_or(false),
             default_exclude_binary_files: anytime_user.defaults.exclude_binary_files,
+            default_ignorefiles: anytime_user
+                .defaults
+                .ignorefiles
+                .unwrap_or_else(|| vec![".gitignore".to_string(), ".ignore".to_string()]),
+            default_ignore: anytime_user
+                .defaults
+                .ignore
+                .unwrap_or_else(|| vec![".*".to_string(), ".git/".to_string()]),
+            default_include: anytime_user
+                .defaults
+                .include
+                .unwrap_or_else(|| vec![".gitignore".to_string()]),
         };
 
         Ok(user_config)
