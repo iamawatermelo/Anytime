@@ -4,6 +4,7 @@ use serde::Deserialize;
 use std::{
     env, fs,
     path::{Path, PathBuf},
+    time::Duration,
 };
 
 pub mod anytime_proj;
@@ -102,16 +103,18 @@ impl ProjectConfig {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug)]
 pub struct UserConfig {
     pub use_relative_filenames: bool,
     pub obfuscate_file_names: bool,
     pub hide_branch_names: bool,
     pub obfuscate_project_names: bool,
     pub use_polling: bool,
+    pub poll_frequency: Duration,
+    pub event_debounce_timeout: Duration,
     pub endpoint: String,
     pub api_key: Option<String>,
-    pub rate_limit_seconds: u64,
+    pub rate_limit: Duration,
     pub offline: bool,
     pub obfuscate_machine: bool,
     pub default_exclude_binary_files: Option<bool>,
@@ -166,7 +169,7 @@ impl UserConfig {
         };
 
         // User config stitching
-        let rate_limit_seconds = {
+        let rate_limit = {
             let limit = anytime_user
                 .heartbeats
                 .rate_limit_seconds
@@ -177,9 +180,9 @@ impl UserConfig {
                     "Heartbeat interval of {} seconds is too low. Setting to 3 seconds.",
                     limit
                 );
-                3
+                Duration::from_secs(3)
             } else {
-                limit
+                Duration::from_secs(limit)
             }
         };
         let user_config = Self {
@@ -192,12 +195,16 @@ impl UserConfig {
             hide_branch_names: anytime_user.files.hide_branch_names.unwrap_or(false),
             obfuscate_project_names: anytime_user.files.obfuscate_project_names.unwrap_or(false),
             use_polling: anytime_user.files.use_polling.unwrap_or(false),
+            poll_frequency: Duration::from_secs(anytime_user.files.poll_frequency.unwrap_or(1)),
+            event_debounce_timeout: Duration::from_secs(
+                anytime_user.files.event_debounce_timeout.unwrap_or(2),
+            ),
             endpoint: wakatime_ini
                 .settings
                 .api_url
                 .unwrap_or_else(|| "https://api.wakatime.com/api/v1".to_string()),
             api_key: wakatime_ini.settings.api_key.or(anytime_user.api.api_key),
-            rate_limit_seconds,
+            rate_limit,
             offline: anytime_user.heartbeats.offline.unwrap_or(true),
             obfuscate_machine: anytime_user.heartbeats.obfuscate_machine.unwrap_or(false),
             default_exclude_binary_files: anytime_user.defaults.exclude_binary_files,

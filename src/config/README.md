@@ -76,6 +76,12 @@ Sources:
 > The polling backend has poor performance. Only use it if your platform-specific
 > backend doesn't work for you, for whatever reason.
 
+- `poll_frequency` _Number_  
+  How often check for new filesystem events, or, how often to poll for new events. You shouldn't change this. Default: 1 second.
+
+- `event_debounce_timeout` _Number_
+  How often to wait to coalesce events before they are reported. You shouldn't change this. Default: 2 seconds.
+
 ### `[api]`
 
 - `endpoint` _String_  

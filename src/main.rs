@@ -109,9 +109,15 @@ fn main() -> Result<()> {
             debug!("using project path {project_path:#?}");
             
             let config = ProjectConfig::load(&project_path, &user_config)?;
+            let (tx, rx) = crossbeam_channel::unbounded();
             debug!("using project config {config:#?}");
             
-            let watcher = FileWatcher::new(project_path.as_path(), &config);
+            let watcher = FileWatcher::new(
+                project_path.as_path(), 
+                &config,
+                &user_config,
+                tx
+            );
         }
         Commands::Test { .. } => todo!()
     }

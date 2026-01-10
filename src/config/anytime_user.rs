@@ -24,6 +24,10 @@ pub struct Files {
     pub obfuscate_project_names: Option<bool>,
     #[serde(default)]
     pub use_polling: Option<bool>,
+    #[serde(default)]
+    pub poll_frequency: Option<u64>,
+    #[serde(default)]
+    pub event_debounce_timeout: Option<u64>,
 }
 
 #[derive(Debug, Deserialize, Default)]

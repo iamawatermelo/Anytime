@@ -36,13 +36,19 @@ user-agent: wakatime/unset (linux-none-none) anytime/0.1.0 anytime-wakatime/0.1.
 
 ## Anytime metadata
 
-- `flags`: also present in UA. See [Flags]
+- `flags`: also present in UA. See [Flags](#flags)
 - `sti`: system time in seconds Anytime has been running
 - `rti`: monotonic time in seconds Anytime has been running
-- `skf`: forward time irregularities (instances where time skipped forward, i.e because the device went to sleep)
+- `skf`: amount of time system time skipped forwards
 - `xcs`: max byt/sec detected by Anytime (may be negative)
 - `mcs`: min byt/sec detected by Anytime (may be negative)
 - `acs`: avg byt/sec detected by Anytime (may be negative)
+
+> [!NOTE]
+> System time can skip forwards for a number of reasons:
+> - The device went to sleep (most common reason)
+> - The user changed their system clock
+> - The OS made a time step to sync with NTP
 
 ## Flags
 
@@ -52,4 +58,4 @@ user-agent: wakatime/unset (linux-none-none) anytime/0.1.0 anytime-wakatime/0.1.
 - `noam`: machine obfuscation enabled
 - `nsr`: non-standard heartbeat interval used
 - `npn`: project name was overridden by a file
-- `tir`: time went backwards while Anytime was open
+- `tir`: system time went backwards while Anytime was open
